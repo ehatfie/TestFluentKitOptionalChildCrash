@@ -10,19 +10,6 @@ import SwiftUI
 @Observable class ViewModel {
     let dbManager = DBManager()
     
-    func start() {
-        Task {
-            
-            do {
-                try await createModel()
-                
-            } catch let err {
-                print("Create model error \(err)")
-            }
-            
-        }
-    }
-    
     func createModel() async {
         print("create model")
         let model = ParentModel(characterID: "test")
@@ -33,20 +20,28 @@ import SwiftUI
         } catch let err {
             print("Error creating model \(err)")
         }
-        
-        
-        //let optionalChild = OptionalChildModel(value: "test value")
     }
     
     func getModel() async {
+        print("get model")
+        do {
+            let models = try await ParentModel.query(on: dbManager.database)
+                .with(\.$optionalChild)
+                .all()
+            print("got \(models.count)")
+        } catch let err {
+            print("Error getting models \(err)")
+        }
+    }
+    
+    func getModelCrashes() async {
+        print("get model crashes")
         do {
             let models = try await ParentModel.query(on: dbManager.database)
                 .field(\.$characterId)
                 .with(\.$optionalChild)
                 .all()
-                //.filter { $0.$optionalChild.value == nil}
-            print("got \(models)")
-            print("optional child \(models.first?.optionalChild)")
+            print("got \(models.count)")
         } catch let err {
             print("Error getting models \(err)")
         }
@@ -58,10 +53,6 @@ struct ContentView: View {
     @State var viewModel = ViewModel()
     var body: some View {
         VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
             Button(action: {
                 Task {
                     await viewModel.createModel()
@@ -75,7 +66,15 @@ struct ContentView: View {
                     await viewModel.getModel()
                 }
             }, label: {
-                Text("Press me ")
+                Text("Get model non crash")
+            })
+            
+            Button(action: {
+                Task {
+                    await viewModel.getModelCrashes()
+                }
+            }, label: {
+                Text("Get model with crash")
             })
         }
         .padding()

@@ -38,19 +38,14 @@ import Fluent
         let eventLoopGroup = MultiThreadedEventLoopGroup(numberOfThreads: self.numThreads)
         let threadPool = NIOThreadPool(numberOfThreads: self.numThreads)
         
-        //DispatchQueue.main.async {
         threadPool.start()
-        //}
         
         self.databases = Databases(threadPool: threadPool, on: eventLoopGroup)
         
-        
-        //databases.use(.sqlite(.file(self.dbName)), as: .sqlite)
         databases.use(.sqlite(.memory), as: .sqlite)
         databases.default(to: .sqlite)
         
         setup()
-
     }
     
     func setup() {
