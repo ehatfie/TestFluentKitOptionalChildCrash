@@ -12,7 +12,7 @@ import SwiftUI
     
     func createModel() async {
         print("create model")
-        let model = ParentModel(characterID: "test")
+        let model = ParentModel(modelProperty: "test")
         do {
             try await model.create(on: dbManager.database).get()
             let optionalChild = OptionalChildModel(value: "test value")
@@ -38,7 +38,7 @@ import SwiftUI
         print("get model crashes")
         do {
             let models = try await ParentModel.query(on: dbManager.database)
-                .field(\.$characterId)
+                .field(\.$modelProperty)
                 .with(\.$optionalChild)
                 .all()
             print("got \(models.count)")

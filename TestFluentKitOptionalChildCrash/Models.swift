@@ -20,16 +20,16 @@ final public class ParentModel: Model, @unchecked Sendable {
     @ID(key: .id)
     public var id: UUID?
     
-    @Field(key: "characterId")
-    public var characterId: String
+    @Field(key: "modelProperty")
+    public var modelProperty: String
     
     @OptionalChild(for: \.$parentModel)
     public var optionalChild: OptionalChildModel?
     
     public init() { }
     
-    public init(characterID: String) {
-        self.characterId = characterID
+    public init(modelProperty: String) {
+        self.modelProperty = modelProperty
     }
     
     public struct ModelMigration: AsyncMigration {
@@ -37,8 +37,8 @@ final public class ParentModel: Model, @unchecked Sendable {
         public func prepare(on database: FluentKit.Database) async throws {
             try await database.schema(ParentModel.schema)
                 .id()
-                .field("characterId", .string)
-                .unique(on: "characterId")
+                .field("modelProperty", .string)
+                .unique(on: "modelProperty")
                 .create()
         }
         
